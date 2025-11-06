@@ -1,0 +1,21 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+
+# User-specific files
+**/*.user
+**/*.suo
+
+# Git files
+**/.git/
+**/.gitignore
+
+# Docker files
+**/Dockerfile*
+**/docker-compose*
+**/.dockerignore
+
+# Publish output
+**/publish/
