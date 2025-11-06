@@ -1,0 +1,48 @@
+name: Build and Push API to Docker Hub
+
+# TRIGGER: When does this workflow run?
+on:
+  push:
+    branches:
+      - main  # Only run when code is pushed to the main branch
+
+# JOBS: What work should be done?
+jobs:
+  build:
+    # RUNNER: What machine to run this on?
+    runs-on: ubuntu-latest  # GitHub provides a fresh Linux machine for each run
+    
+    # PERMISSIONS: What can this workflow access?
+    permissions:
+      contents: read  # Read access to your code
+
+    # STEPS: Individual tasks to execute in order
+    steps:
+      # Step 1: Get your code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4  # This is a pre-built GitHub Action
+      
+      # Step 2: Set up Docker build tools
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        # Why? Buildx is a newer Docker build tool that's faster
+      
+      # Step 3: Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}  # Gets your username from secrets
+          password: ${{ secrets.DOCKER_PASSWORD }}  # Gets your token from secrets
+      
+      # Step 4: Build and push the Docker image
+      - name: Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .  # Build context is the current directory
+          push: true  # Push to Docker Hub (push: false would just build locally)
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/weather-api:latest
+            ${{ secrets.DOCKER_USERNAME }}/weather-api:${{ github.sha }}
+          # Tags explain:
+          # - latest: Always points to the most recent build
+          # - ${{ github.sha }}: Uses the commit hash for version tracking
